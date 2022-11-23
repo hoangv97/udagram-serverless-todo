@@ -1,13 +1,16 @@
 import * as AWS from 'aws-sdk'
+import * as AWSXray from 'aws-xray-sdk';
 import { DocumentClient } from 'aws-sdk/clients/dynamodb'
 import { TodoItem } from '../models/TodoItem'
 import { TodoUpdate } from '../models/TodoUpdate'
 
 // /TODO: Implement the dataLayer logic
+const XAWS = AWSXray.captureAWS(AWS);
+
 export class TodosAccess {
 
   constructor(
-    private readonly docClient: DocumentClient = createDynamoDBClient(),
+    private readonly docClient: DocumentClient = new XAWS.DynamoDB.DocumentClient(),
     private readonly todosTable = process.env.TODOS_TABLE
   ) { }
 
@@ -81,9 +84,4 @@ export class TodosAccess {
       ReturnValues: "NONE"
     }).promise()
   }
-}
-
-/** Create Dynamo Db */
-function createDynamoDBClient() {
-  return new AWS.DynamoDB.DocumentClient()
 }
